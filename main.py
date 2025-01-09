@@ -1,9 +1,16 @@
 from ctypes import windll, Structure, byref, c_int
 import win32gui
+import win32api
+import win32con
 import time
 
 class RECT(Structure):
     _fields_ = [("left", c_int), ("top", c_int), ("right", c_int), ("bottom", c_int)]
+
+def set_refresh_rate(rate):
+    devmode = win32api.EnumDisplaySettings(None, win32con.ENUM_CURRENT_SETTINGS)
+    devmode.DisplayFrequency = rate
+    win32api.ChangeDisplaySettings(devmode, win32con.CDS_FULLSCREEN)
 
 def is_any_full_screen():
     user32 = windll.user32
@@ -41,9 +48,9 @@ def main():
     print("[INFO] Starting fullscreen detection loop")
     while True:
         if is_any_full_screen():
-            print("[INFO] A fullscreen application is currently active.")
+            set_refresh_rate(60)
         else:
-            print("[INFO] No fullscreen application is active.")
+            set_refresh_rate(120)
         time.sleep(1)  # Check every second
 
 if __name__ == "__main__":
